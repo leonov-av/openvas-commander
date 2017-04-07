@@ -2,7 +2,7 @@
 
 function install_dependencies()
 {
-    apt-get install -y build-essential devscripts dpatch curl libassuan-dev libglib2.0-dev libgpgme11-dev libpcre3-dev libpth-dev libwrap0-dev libgmp-dev libgmp3-dev libgpgme11-dev libpcre3-dev libpth-dev quilt cmake pkg-config libssh-dev libglib2.0-dev libpcap-dev libgpgme11-dev uuid-dev bison libksba-dev doxygen sqlfairy xmltoman sqlite3 libsqlite3-dev wamerican redis-server libhiredis-dev libsnmp-dev libmicrohttpd-dev libxml2-dev libxslt1-dev xsltproc libssh2-1-dev libldap2-dev autoconf nmap libgnutls28-dev libpopt-dev heimdal-dev heimdal-multidev libpopt-dev mingw32 texlive-full rpm alien nsis rsync python2.7 python-setuptools checkinstall
+    apt-get install -y build-essential devscripts dpatch curl libassuan-dev libglib2.0-dev libgpgme11-dev libpcre3-dev libpth-dev libwrap0-dev libgmp-dev libgmp3-dev libgpgme11-dev libpcre3-dev libpth-dev quilt cmake pkg-config libssh-dev libglib2.0-dev libpcap-dev libgpgme11-dev uuid-dev bison libksba-dev doxygen sqlfairy xmltoman sqlite3 libsqlite3-dev wamerican redis-server libhiredis-dev libsnmp-dev libmicrohttpd-dev libxml2-dev libxslt1-dev xsltproc libssh2-1-dev libldap2-dev autoconf nmap libgnutls28-dev gnutls-bin libpopt-dev heimdal-dev heimdal-multidev libpopt-dev mingw32 texlive-full rpm alien nsis rsync python2.7 python-setuptools checkinstall
 }
 
 function configure_redis()
@@ -16,7 +16,7 @@ function configure_redis()
 
 function get_openvas_source_table()
 {
-    curl -s http://openvas.org/install-source.html | sed -e ':a;N;$!ba;s/\n/ /g' -e 's/.*<table class="dl_table"//' -e 's/<\/table>.*//' -e 's/<tr>/\n<tr>/g' | grep "<tr>" | grep -v "bgcolor"  | sed  -e 's/[ \t]*<\/t[dh]>[ \t]*/|/g' -e 's/"[ \t]*>[^<]*<\/a>//g' -e 's/<a href="//g' -e 's/[ \t]*<[/]*t[rdh]>[ \t]*//g' -e 's/|$//'
+    curl -s http://openvas.org/install-source.html | sed -e ':a;N;$!ba;s/\n/ /g' -e 's/.*<table class="dl_table"//' -e 's/<\/table>.*//' -e 's/<tr>/\n<tr>/g' | grep "<tr>" | grep -v "bgcolor"  | sed  -e 's/[ \t]*<\/t[dh]>[ \t]*/|/g' -e 's/"[ \t]*>[^<]*<\/a>//g' -e 's/<a href="//g' -e 's/[ \t]*<[/]*t[rdh]>[ \t]*//g' -e 's/|$//' | grep -v "Supports OMP "
 }
 
 function get_available_source_sets()
@@ -40,7 +40,7 @@ function get_source_set()
 {
     local release_name="$1"
     col=`get_available_source_sets | awk -v name="$release_name" '{ if ( $0 == name ){print NR}}'`
-    echo "$openvas_source_table" | awk -F"|" -v col="$col" '{ if (NR != 1 && $1!=""){print $col}}'
+    echo "$openvas_source_table" | awk -F"|" -v col="$col" '{ if ( NR != 1 && $1 != "" && $col != "" ){print $col}}'
 }
 
 function download_source_set()
@@ -76,8 +76,10 @@ function install_component()
 
 function mkcerts()
 {
-    openvas-mkcert
-    openvas-mkcert-client -n -i
+    
+    openvas-mkcert 2>/dev/null
+    openvas-mkcert-client -n -i 2>/dev/null
+    openvas-manage-certs -a 2>/dev/null
 }
 
 #################################
@@ -156,17 +158,33 @@ fi
 
 if [ "$1" == "--configure-all" ]
 then
+    mkdir /usr/local/var/lib/openvas/openvasmd/
+    mkdir /usr/local/var/lib/openvas/openvasmd/gnupg
     configure_redis
     mkcerts
     ldconfig
     openvasmd --create-user=admin --role=Admin && openvasmd --user=admin --new-password=1
 fi
 
+if [ "$1" == "--delete-admin" ]
+then
+    openvasmd --delete-user=admin
+fi
+
 if [ "$1" == "--update-content" ]
 then
-    /usr/local/sbin/openvas-nvt-sync
-    /usr/local/sbin/openvas-scapdata-sync
-    /usr/local/sbin/openvas-certdata-sync
+    if [ -f /usr/local/sbin/openvas-nvt-sync ]
+    then
+        /usr/local/sbin/openvas-nvt-sync
+        /usr/local/sbin/openvas-scapdata-sync
+        /usr/local/sbin/openvas-certdata-sync
+    fi 
+    if [ -f /usr/local/sbin/greenbone-certdata-sync ]
+    then
+        /usr/local/sbin/greenbone-nvt-sync
+        /usr/local/sbin/greenbone-scapdata-sync
+        /usr/local/sbin/greenbone-certdata-sync
+    fi
 fi
 
 if [ "$1" == "--rebuild-content" ]
@@ -198,7 +216,15 @@ then
         wget https://svn.wald.intevation.org/svn/openvas/trunk/tools/openvas-check-setup --no-check-certificate
         chmod 0755 openvas-check-setup
     fi
-    ./openvas-check-setup --v8 --server
+    
+    if [ "$2" == "" ]
+    then
+        version="v9"
+    else
+        version="$2"
+    fi
+    
+    ./openvas-check-setup --$version --server
 fi
 
 if [ "$1" == "--check-proc" ]
@@ -232,4 +258,3 @@ fi
 #cd ospd-w3af-*
 #python setup.py install --prefix=/usr/local
 #cd ../
-
