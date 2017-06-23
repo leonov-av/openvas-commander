@@ -187,6 +187,18 @@ then
     fi
 fi
 
+if [ "$1" == "--update-content-nvt" ]
+then
+    if [ -f /usr/local/sbin/openvas-nvt-sync ]
+    then
+        /usr/local/sbin/openvas-nvt-sync --curl
+    fi 
+    if [ -f /usr/local/sbin/greenbone-certdata-sync ]
+    then
+        /usr/local/sbin/greenbone-nvt-sync --curl
+    fi
+fi
+
 if [ "$1" == "--rebuild-content" ]
 then
     /usr/local/sbin/openvasmd --rebuild --progress
