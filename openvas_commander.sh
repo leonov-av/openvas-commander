@@ -121,7 +121,10 @@ function print_help()
 
  Check installation status:
   --check-status [VERSION]         download and run openvas-check-setup tool
-                                   \"v9\" by default"
+                                   \"v9\" by default
+  
+ Other
+ --help, -h, ?                     help page"
 
 }
 
@@ -130,7 +133,7 @@ function print_help()
 release_name="$1"
 openvas_source_table=`get_openvas_source_table`
 
-if [ "$1" == "--help" ] || [ "$1" == "--h" ] || [ "$1" == "?" ]
+if [ "$1" == "--help" ] || [ "$1" == "-h" ] || [ "$1" == "?" ]
 then
     print_help
 elif [ "$1" == "--install-dependencies" ]
