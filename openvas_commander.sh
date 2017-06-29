@@ -92,17 +92,17 @@ function print_help()
 
  Getting data from openvas.org:
   --show-releases                  show release version, e.g. OpenVAS-9
-  --show-sources RELEASE           show RELEASE source packages
-  --download-sources RELEASE       download RELEASE sources packages
+  --show-sources RELEASE           show RELEASE source archives
+  --download-sources RELEASE       download RELEASE sources archives
 
  Process software components:
-  --create-folders                 create folders from sources packages
+  --create-folders                 create folders for sources archives
 
-  --install-all                    install all component sources packages
-  --install-component COMPONENT    install COMPONENT sources package
+  --install-all                    install all components
+  --install-component COMPONENT    install COMPONENT
 
-  --uninstall-all                  uninstall all component sources packages
-  --uninstall-component COMPONENT  uninstall COMPONENT sources package
+  --uninstall-all                  uninstall all components
+  --uninstall-component COMPONENT  uninstall COMPONENT
 
  Configuration:
   --configure-all                  configure all components
@@ -110,14 +110,14 @@ function print_help()
 
  Process software components:
   --update-content                 update OpenVAS NVT, OVAL and CERT content
-  --update-content-nvt             update OpenVAS NVT content
+  --update-content-nvt             update only OpenVAS NVT content
   --rebuild-content                rebuild database
 
  Manage processes:
   --start-all                      start openvasmd, openvassd and gsad processes
                                    use --check-proc to make sure that processes ready
-  --kill-all                       kill pocesses openvasmd, openvassd and gsad
-  --check-proc                     check state of openvasmd, openvassd and gsad
+  --kill-all                       kill openvasmd, openvassd and gsad pocesses
+  --check-proc                     check state of openvasmd, openvassd and gsad pocesses
 
  Check installation status:
   --check-status [VERSION]         download and run openvas-check-setup tool
