@@ -116,8 +116,8 @@ function print_help()
  Manage processes:
   --start-all                      start openvasmd, openvassd and gsad processes
                                    use --check-proc to make sure that processes ready
-  --kill-all                       kill openvasmd, openvassd and gsad pocesses
-  --check-proc                     check state of openvasmd, openvassd and gsad pocesses
+  --kill-all                       kill openvasmd, openvassd and gsad processes
+  --check-proc                     check state of openvasmd, openvassd and gsad processes
 
  Check installation status:
   --check-status [VERSION]         download and run openvas-check-setup tool
