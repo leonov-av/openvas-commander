@@ -82,22 +82,66 @@ function mkcerts()
     openvas-manage-certs -a 2>/dev/null
 }
 
+function print_help()
+{
+
+    help=$(cat <<-END
+Usage: ./openvas_commander.sh OPTION [PARAM]
+
+ Installing dependencies:
+  --install-dependencies           install Debian packages 
+
+ Getting data from openvas.org:
+  --show-releases                  show release version, e.g. OpenVAS-9
+  --show-sources RELEASE           show RELEASE source packages
+  --download-sources RELEASE       download RELEASE sources packages
+
+ Process software components:
+  --create-folders                 create folders from sources packages
+
+  --install-all                    install all component sources packages
+  --install-component COMPONENT    install COMPONENT sources package
+
+  --uninstall-all                  uninstall all component sources packages
+  --uninstall-component COMPONENT  uninstall COMPONENT sources package
+
+ Configuration:
+  --configure-all                  configure all components
+  --delete-admin                   delete OpenVAS admin account
+
+ Process software components:
+  --update-content                 update OpenVAS NVT, OVAL and CERT content
+  --update-content-nvt             update OpenVAS NVT content
+  --rebuild-content                rebuild database
+
+ Manage processes:
+  --start-all                      start openvasmd, openvassd and gsad processes
+                                   use --check-proc to make sure that processes ready
+  --kill-all                       kill pocesses openvasmd, openvassd and gsad
+  --check-proc                     check state of openvasmd, openvassd and gsad
+
+ Check installation status:
+  --check-status [VERSION]         download and run openvas-check-setup tool
+                                   "v9" by default
+    END
+    )
+}
+
 #################################
 
 release_name="$1"
 openvas_source_table=`get_openvas_source_table`
 
-if [ "$1" == "--install-dependencies" ]
+if [ "$1" == "--help" ] || [ "$1" == "--h" ] || [ "$1" == "?" ]
+then
+    print_help
+elif [ "$1" == "--install-dependencies" ]
 then
     install_dependencies
-fi
-
-if [ "$1" == "--show-releases" ]
+elif [ "$1" == "--show-releases" ]
 then
     get_available_source_sets
-fi
-
-if [ "$1" == "--show-sources" ]
+elif [ "$1" == "--show-sources" ]
 then
     release_name="$2"
     check=`check_releas_name "$release_name"`
@@ -107,9 +151,7 @@ then
     else
         echo "$check"
     fi
-fi
-
-if [ "$1" == "--download-sources" ]
+elif [ "$1" == "--download-sources" ]
 then
     release_name="$2"
     check=`check_releas_name "$release_name"`
@@ -119,14 +161,10 @@ then
     else
         echo "$check"
     fi
-fi
-
-if [ "$1" == "--create-folders" ]
+elif  [ "$1" == "--create-folders" ]
 then
     create_folders
-fi
-
-if [ "$1" == "--uninstall-all" ]
+elif [ "$1" == "--uninstall-all" ]
 then
     dpkg -r "openvas-smb"
     dpkg -r "openvas-libraries"
@@ -134,9 +172,7 @@ then
     dpkg -r "openvas-manager"
     dpkg -r "openvas-cli"
     dpkg -r "greenbone-security-assistant"
-fi
-
-if [ "$1" == "--install-all" ]
+elif  [ "$1" == "--install-all" ]
 then
     install_component "openvas-smb"
     install_component "openvas-libraries"
@@ -144,19 +180,13 @@ then
     install_component "openvas-manager"
     install_component "openvas-cli"
     install_component "greenbone-security-assistant"
-fi
-
-if [ "$1" == "--install-component" ]
+elif [ "$1" == "--install-component" ]
 then
     install_component "$2"
-fi
-
-if [ "$1" == "--uninstall-component" ]
+elif [ "$1" == "--uninstall-component" ]
 then
     dpkg -r "$2"
-fi
-
-if [ "$1" == "--configure-all" ]
+elif [ "$1" == "--configure-all" ]
 then
     mkdir /usr/local/var/lib/openvas/openvasmd/
     mkdir /usr/local/var/lib/openvas/openvasmd/gnupg
@@ -164,14 +194,10 @@ then
     mkcerts
     ldconfig
     openvasmd --create-user=admin --role=Admin && openvasmd --user=admin --new-password=1
-fi
-
-if [ "$1" == "--delete-admin" ]
+elif [ "$1" == "--delete-admin" ]
 then
     openvasmd --delete-user=admin
-fi
-
-if [ "$1" == "--update-content" ]
+elif [ "$1" == "--update-content" ]
 then
     if [ -f /usr/local/sbin/openvas-nvt-sync ]
     then
@@ -185,9 +211,7 @@ then
         /usr/local/sbin/greenbone-scapdata-sync
         /usr/local/sbin/greenbone-certdata-sync
     fi
-fi
-
-if [ "$1" == "--update-content-nvt" ]
+elif [ "$1" == "--update-content-nvt" ]
 then
     if [ -f /usr/local/sbin/openvas-nvt-sync ]
     then
@@ -197,14 +221,10 @@ then
     then
         /usr/local/sbin/greenbone-nvt-sync --curl
     fi
-fi
-
-if [ "$1" == "--rebuild-content" ]
+elif [ "$1" == "--rebuild-content" ]
 then
     /usr/local/sbin/openvasmd --rebuild --progress
-fi
-
-if [ "$1" == "--start-all" ]
+elif  [ "$1" == "--start-all" ]
 then
 
     mkdir /usr/local/var/run 2>/dev/null; 
@@ -214,14 +234,10 @@ then
     /usr/local/sbin/openvasmd
     /usr/local/sbin/openvassd
     /usr/local/sbin/gsad
-fi
-
-if [ "$1" == "--kill-all" ]
+elif  [ "$1" == "--kill-all" ]
 then
     ps aux | egrep "(openvas.d|gsad)" | awk '{print $2}' | xargs -i kill -9 '{}'
-fi
-
-if [ "$1" == "--check-status" ]
+elif [ "$1" == "--check-status" ]
 then
     if [ ! -f openvas-check-setup ]; 
     then
@@ -237,11 +253,12 @@ then
     fi
     
     ./openvas-check-setup --$version --server
-fi
-
-if [ "$1" == "--check-proc" ]
+elif  [ "$1" == "--check-proc" ]
 then
     ps aux | egrep "(openvas.d|gsad)"
+else
+    echo "Unknown command"
+    print_help
 fi
 
 #### TODO OSPD
