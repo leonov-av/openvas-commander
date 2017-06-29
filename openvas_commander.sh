@@ -85,7 +85,7 @@ function mkcerts()
 function print_help()
 {
 
-echo "Usage: ./openvas_commander.sh OPTION [PARAM]
+    echo "Usage: ./openvas_commander.sh OPTION [PARAM]
 
  Installing dependencies:
   --install-dependencies           install Debian packages 
