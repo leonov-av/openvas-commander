@@ -124,7 +124,7 @@ function print_help()
                                    \"v9\" by default
   
  Other
- --help, -h, ?                     help page"
+  --help, -h, ?                    help page"
 
 }
 
