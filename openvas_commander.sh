@@ -85,8 +85,7 @@ function mkcerts()
 function print_help()
 {
 
-    help=$(cat <<-END
-Usage: ./openvas_commander.sh OPTION [PARAM]
+echo "Usage: ./openvas_commander.sh OPTION [PARAM]
 
  Installing dependencies:
   --install-dependencies           install Debian packages 
@@ -122,9 +121,8 @@ Usage: ./openvas_commander.sh OPTION [PARAM]
 
  Check installation status:
   --check-status [VERSION]         download and run openvas-check-setup tool
-                                   "v9" by default
-    END
-    )
+                                   \"v9\" by default"
+
 }
 
 #################################
