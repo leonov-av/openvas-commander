@@ -123,7 +123,7 @@ function print_help()
   --check-status [VERSION]         download and run openvas-check-setup tool
                                    \"v9\" by default
   
- Other
+ Other:
   --help, -h, ?                    help page"
 
 }
