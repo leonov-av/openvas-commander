@@ -237,7 +237,7 @@ then
     /usr/local/sbin/gsad
 elif  [ "$1" == "--kill-all" ]
 then
-    ps aux | egrep "(openvas.d|gsad)" | awk '{print $2}' | xargs -i kill -9 '{}'
+    ps aux | egrep "(openvas|gsad)" | awk '{print $2}' | xargs -i kill -9 '{}'
 elif [ "$1" == "--check-status" ]
 then
     if [ ! -f openvas-check-setup ]; 
